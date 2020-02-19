@@ -85,7 +85,7 @@ class DailyAlarm : BroadcastReceiver(), OnCompleteListener<Void> {
 
                 val end: Calendar = Calendar.getInstance().apply {
                     timeInMillis = System.currentTimeMillis()
-                    set(Calendar.HOUR_OF_DAY, 22)
+                    set(Calendar.HOUR_OF_DAY, 18)
                     set(Calendar.MINUTE, 0)
                 }
                 val diff = end.timeInMillis - start.timeInMillis
