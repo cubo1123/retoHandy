@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">RetoHandy</string>
+
+    <string name="geofence_not_available">Geofence service is not available now</string>
+    <string name="geofence_too_many_geofences">Your app has registered too many geofences</string>
+    <string name="geofence_too_many_pending_intents">
+        You have provided too many PendingIntents to the addGeofences() call
+    </string>
+    <string name="unknown_geofence_error">
+        Unknown error: the Geofence service is not available now
+    </string>
+    <string name="geofence_transition_invalid_type">
+        Geofence transition error: invalid transition type %1$d
+    </string>
+    <string name="geofence_transition_entered">Recuerda iniciar tu visita con </string>
+    <string name="geofence_transition_exited">Recuerda finalizar tu visita con </string>
+    <string name="unknown_geofence_transition">Unknown Transition</string>
+
+    <string name="geofence_transition_notification_text">
+        Recuerda mantenerte al dia con tus visitas
+    </string>
+    <string name="initialized">Initialized</string>
+    <string name="last_visit">Ultima visita:</string>
+    <string name="onVisit">En visita</string>
+    <string name="minutes">Minutos</string>
+    <string name="seconds">Segundos</string>
+    <string name="give_permission">Proporcione los servicios para continuar</string>
+    <string name="check">Start To Work</string>
+    <string name="notifications_status">notification_status</string>
+    <string name="geo_status">GeoStatus</string>
+    <string name="remember_visit">Tienes clientes cerca</string>
+</resources>
