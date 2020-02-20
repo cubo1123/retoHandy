@@ -92,6 +92,7 @@ class DailyAlarm : BroadcastReceiver(), OnCompleteListener<Void> {
                 Log.e(TAG,diff.toString())
                 durationTime = diff
             }
+            Log.i(TAG,"duration"+durationTime.toString())
             dataSource?.getCurrentGeoFences()?.forEach {
                 Log.e(TAG,it.toString())
                 mGeofenceList.add(
@@ -102,8 +103,9 @@ class DailyAlarm : BroadcastReceiver(), OnCompleteListener<Void> {
                             it.longitude,
                             300f
                         )
+                        .setLoiteringDelay(180000)
                         .setExpirationDuration(durationTime)
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL or Geofence.GEOFENCE_TRANSITION_EXIT)
                         .build()
                 )
             }
@@ -112,7 +114,7 @@ class DailyAlarm : BroadcastReceiver(), OnCompleteListener<Void> {
 
     private fun getGeofencingRequest(): GeofencingRequest {
         val builder = GeofencingRequest.Builder()
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+        builder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_DWELL )
         builder.addGeofences(mGeofenceList)
         return builder.build()
     }

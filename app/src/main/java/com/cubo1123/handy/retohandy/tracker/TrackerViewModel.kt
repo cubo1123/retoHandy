@@ -39,7 +39,7 @@ class TrackerViewModel(
 
     private suspend fun updateStatus(point: Long) {
         withContext(Dispatchers.IO) {
-            val checkPrev = database.getGeofenceActive()
+            val checkPrev = database.getCurrentVisit()
             if (checkPrev?.onVisit == true){
                 checkPrev.onVisit = checkPrev.onVisit.not()
                 checkPrev.lasVisitEnd = System.currentTimeMillis()
@@ -63,11 +63,11 @@ class TrackerViewModel(
     fun initDB(){
         uiScope.launch {
             val alarm = DailyAlarm()
-            var point = SavedGeofence(latitude =20.6667983,longitude =  -103.4380111,name =  "Cliente 1",lasVisitStart = System.currentTimeMillis(),lasVisitEnd = System.currentTimeMillis())
+            var point = SavedGeofence(latitude =20.622439,longitude =  -103.261452,name =  "Cliente 1",lasVisitStart = System.currentTimeMillis(),lasVisitEnd = System.currentTimeMillis())
             insert(point)
-            point = SavedGeofence(latitude = 20.676406,longitude =  -103.4205262,name =  "Cliente 2",lasVisitStart = System.currentTimeMillis(),lasVisitEnd = System.currentTimeMillis())
+            point = SavedGeofence(latitude = 20.630612,longitude =  -103.266323,name =  "Cliente 2",lasVisitStart = System.currentTimeMillis(),lasVisitEnd = System.currentTimeMillis())
             insert(point)
-            point = SavedGeofence(latitude = 20.6739116,longitude =  -103.4351432,name =  "Cliente 3",lasVisitStart = System.currentTimeMillis(),lasVisitEnd = System.currentTimeMillis())
+            point = SavedGeofence(latitude = 20.659363,longitude =  -103.323656,name =  "Cliente 3",lasVisitStart = System.currentTimeMillis(),lasVisitEnd = System.currentTimeMillis())
             insert(point)
             point = SavedGeofence(latitude = 20.6745029,longitude =  -103.4282778,name =  "Cliente 4",lasVisitStart = System.currentTimeMillis(),lasVisitEnd = System.currentTimeMillis())
             insert(point)

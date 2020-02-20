@@ -47,10 +47,8 @@ class TrackerFragment : Fragment(){
         if (sharedPref!!.getBoolean(getString(R.string.initialized),false).not()){
             trackerViewModel.initDB()
             sharedPref.edit().putBoolean(getString(R.string.initialized),true).apply()
-        }else if (sharedPref.getBoolean(getString(R.string.geo_status),false).not()){
-            if (sharedPref.getBoolean(getString(R.string.initialized),false)){
-                trackerViewModel.setRemaining()
-            }
+        }else {
+            trackerViewModel.setRemaining()
         }
         binding.list.adapter = adapter
 

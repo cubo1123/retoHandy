@@ -32,6 +32,7 @@ class GeofenceTransitionsJobIntentService : JobIntentService() {
 
     override fun onHandleWork(intent: Intent) {
         val geofencingEvent = GeofencingEvent.fromIntent(intent)
+
         if (geofencingEvent.hasError()) {
             val errorMessage = getErrorString(
                 this,
@@ -43,17 +44,12 @@ class GeofenceTransitionsJobIntentService : JobIntentService() {
 
         val geofenceTransition = geofencingEvent.geofenceTransition
 
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+        val triggeringGeofences = geofencingEvent.triggeringGeofences
 
-            val triggeringGeofences = geofencingEvent.triggeringGeofences
-
-            getGeofenceTransitionDetails(
-                geofenceTransition,
-                triggeringGeofences
-            )
-        } else {
-            Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition))
-        }
+        getGeofenceTransitionDetails(
+            geofenceTransition,
+            triggeringGeofences
+        )
     }
 
     fun getErrorString(context: Context, errorCode: Int): String {
@@ -71,25 +67,62 @@ class GeofenceTransitionsJobIntentService : JobIntentService() {
         triggeringGeofences: List<Geofence>
     ) {
 
-        val dataSource = baseContext.let { DatabaseGeofences.getInstance(it).trackerDatabaseDao }
-        if(getTransitionString(geofenceTransition) == getString(R.string.geofence_transition_exited)){
+        val geofenceTransitionString = getTransitionString(geofenceTransition)
 
+        val dataSource = baseContext.let { DatabaseGeofences.getInstance(it).trackerDatabaseDao }
+        Log.i(TAG,geofenceTransitionString)
+        Log.i(TAG,triggeringGeofences.toString())
+        if(geofenceTransitionString == getString(R.string.geofence_transition_entered)){
+            checkGeofence(dataSource,triggeringGeofences,geofenceTransitionString)
+        } else if(geofenceTransitionString == getString(R.string.geofence_transition_exited)){
+            checkCurrentClient(dataSource,triggeringGeofences,geofenceTransitionString)
         }
-        for (geofence in triggeringGeofences) {
-            checkGeofence(dataSource,geofence.requestId.toLong())
-        }
+
     }
 
 
-    private fun checkGeofence(dataSource: SavedGeofenceDao?, id : Long) {
+    private fun checkCurrentClient(
+        dataSource: SavedGeofenceDao?,
+        triggeringGeofences: List<Geofence>,
+        geofenceTransitionString: String
+    ) {
         uiScope.launch {
-            val current = getGeofence(dataSource,id)
+            val currentClient = checkCurrentVisit(dataSource)
+            triggeringGeofences.forEach {
+                if (currentClient?.id == it.requestId.toLong()){
+                    Log.i(TAG,"Notification sended")
+                    sendNotification(geofenceTransitionString + currentClient.name)
+                    updateNotification(dataSource,it.requestId.toLong())
+                }
+            }
+
+        }
+    }
+
+    private suspend fun checkCurrentVisit(dataSource: SavedGeofenceDao?): SavedGeofence? {
+        return withContext(Dispatchers.IO) {
+            dataSource?.getCurrentVisit()
+        }
+    }
+
+    private fun checkGeofence(
+        dataSource: SavedGeofenceDao?,
+        triggeringGeofences: List<Geofence>,
+        geofenceTransitionString: String
+    ) {
+        uiScope.launch {
+            var clients = ""
+            var id = 0L
+            triggeringGeofences.forEach {
+                clients += getGeofence(dataSource,it.requestId.toLong())?.name
+                clients +=","
+                id = it.requestId.toLong()
+            }
             if (checkLastNotification(dataSource)){
                 Log.i(TAG,"Notification sended")
-                sendNotification(current?.name ?: getString(R.string.remember_visit))
+                sendNotification(geofenceTransitionString + clients)
                 updateNotification(dataSource,id)
-            }else
-                Log.i(TAG,"<30 minutos")
+            }
         }
     }
 
@@ -164,9 +197,8 @@ class GeofenceTransitionsJobIntentService : JobIntentService() {
 
     private fun getTransitionString(transitionType: Int): String {
         when (transitionType) {
-            Geofence.GEOFENCE_TRANSITION_ENTER -> return getString(R.string.geofence_transition_entered)
+            Geofence.GEOFENCE_TRANSITION_DWELL -> return getString(R.string.geofence_transition_entered)
             Geofence.GEOFENCE_TRANSITION_EXIT -> {
-                LocationMoving.enqueueWork(this,Intent())
                 return getString(R.string.geofence_transition_exited)
             }
             else -> return getString(R.string.unknown_geofence_transition)

@@ -46,7 +46,7 @@ interface SavedGeofenceDao {
     fun getGeofence(): SavedGeofence?
 
     @Query("SELECT * FROM saved_geo_fences WHERE on_visit")
-    fun getGeofenceActive(): SavedGeofence?
+    fun getCurrentVisit(): SavedGeofence?
 
     @Query("SELECT * FROM saved_geo_fences ORDER BY last_notification DESC LIMIT 1")
     fun getLastNotification(): SavedGeofence?
